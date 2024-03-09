@@ -27,7 +27,14 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$kotlin_version")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 ktor {
