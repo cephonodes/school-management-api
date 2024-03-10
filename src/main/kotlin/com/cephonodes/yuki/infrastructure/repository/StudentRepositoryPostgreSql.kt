@@ -41,13 +41,13 @@ class StudentRepositoryPostgreSql : IStudentRepository {
             }
         val sortCondition =
             when (sortBy) {
-                null -> students.name
+                null -> null
                 SortBy.NAME -> students.name
                 SortBy.LOGIN_ID -> students.loginID
             }
         val sqlSortOrder =
             when (sortOrder) {
-                null -> org.jetbrains.exposed.sql.SortOrder.ASC
+                null -> null
                 SortOrder.ASC -> org.jetbrains.exposed.sql.SortOrder.ASC
                 SortOrder.DESC -> org.jetbrains.exposed.sql.SortOrder.DESC
             }
@@ -59,8 +59,11 @@ class StudentRepositoryPostgreSql : IStudentRepository {
                 .select(students.id, students.name, students.loginID, classrooms.id, classrooms.name)
                 .where {
                     facilitator_classroom_relation.facilitatorID.eq(facilitatorID) and studentFilter
+                }.apply {
+                    if (sortCondition != null && sqlSortOrder != null) {
+                        orderBy(sortCondition, sqlSortOrder)
+                    }
                 }
-                .orderBy(sortCondition, sqlSortOrder)
                 .forEach { row ->
                     result.add(Student(
                         row[students.id].value,
