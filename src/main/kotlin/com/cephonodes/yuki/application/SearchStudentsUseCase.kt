@@ -14,6 +14,10 @@ class SearchStudentsUseCase(private val studentRepository: IStudentRepository) {
     ): List<Student> {
         val students = this.studentRepository.search(facilitatorID, sortBy, sortOrder, filterBy, filterQuery)
 
+        if (students.isEmpty()) {
+            return students
+        }
+
         // ページネーション
         val fromIndex = limit * (page - 1)
         if (fromIndex >= students.size) {

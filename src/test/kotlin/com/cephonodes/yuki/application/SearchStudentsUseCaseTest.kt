@@ -2,6 +2,9 @@ package com.cephonodes.yuki.application
 
 import com.cephonodes.yuki.domain.*
 import com.cephonodes.yuki.infrastructure.repository.StudentRepositoryInMemory
+import io.mockk.every
+import io.mockk.mockkClass
+import io.mockk.mockkConstructor
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments.arguments
@@ -70,6 +73,33 @@ class SearchStudentsUseCaseTest {
             )
         )
     )
+
+    @Test
+    fun 正常系_取得できたデータが0件だった時() {
+        val facilitatorID = 1
+        val sortBy = SortBy.NAME
+        val sortOrder = SortOrder.ASC
+        val page = 4
+        val limit = 2
+        val filterBy = FilterBy.NAME
+        val filterQuery = "abc"
+
+        // モックを作成する
+        val repository = mockkClass(StudentRepositoryInMemory::class)
+        every { repository.search(
+            facilitatorID = facilitatorID,
+            sortBy = sortBy,
+            sortOrder = sortOrder,
+            filterBy = filterBy,
+            filterQuery = filterQuery
+        ) } returns listOf()
+
+        val useCase = SearchStudentsUseCase(repository)
+        val result = useCase.execute(facilitatorID, sortBy, sortOrder, filterBy, filterQuery, page, limit)
+        val expected: List<Student> = listOf()
+
+        assertEquals(expected, result)
+    }
 
     @Test
     fun 異常系_存在しないページが指定された時() {

@@ -128,6 +128,30 @@ class StudentControllerTest {
                 ),
                 2
             )
+        ),
+        arguments(
+            Parameters.build {
+                append("facilitator_id", "2")
+                append("page", "2")
+                append("limit", "1")
+                append("sort", "loginId")
+                append("order", "desc")
+                append("loginId_like", "123")
+            },
+            ExpectedUseCaseInput(
+                2,
+                SortOrder.DESC,
+                2,
+                1,
+                SortBy.LOGIN_ID,
+                FilterBy.LOGIN_ID,
+                "123"
+            ),
+            listOf<Student>(),
+            SearchStudentsResponseBody(
+                listOf(),
+                0
+            )
         )
     )
 }
