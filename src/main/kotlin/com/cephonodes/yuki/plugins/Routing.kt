@@ -10,7 +10,7 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         get("/students") {
-            val studentController = StudentController(StudentRepositoryInMemory())
+            val studentController = StudentController(StudentRepositoryPostgreSql())
             val (statusCode, body) = studentController.searchStudents(call.request.queryParameters)
             call.respond(statusCode, body)
         }
