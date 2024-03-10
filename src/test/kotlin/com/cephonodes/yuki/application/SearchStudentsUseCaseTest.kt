@@ -28,9 +28,11 @@ class SearchStudentsUseCaseTest {
         val filterBy = FilterBy.NAME
         val filterQuery = "abc"
 
+        // テスト対象を実行する
         val useCase = SearchStudentsUseCase(StudentRepositoryInMemory())
         val result = useCase.execute(facilitatorID, sortBy, sortOrder, filterBy, filterQuery, page, limit)
 
+        // 検証する
         assertEquals(expected, result)
     }
 
@@ -75,7 +77,7 @@ class SearchStudentsUseCaseTest {
     )
 
     @Test
-    fun 正常系_取得できたデータが0件だった時() {
+    fun 正常系_取得できたデータが0件の時() {
         val facilitatorID = 1
         val sortBy = SortBy.NAME
         val sortOrder = SortOrder.ASC
@@ -94,10 +96,12 @@ class SearchStudentsUseCaseTest {
             filterQuery = filterQuery
         ) } returns listOf()
 
+        // テスト対象を実行する
         val useCase = SearchStudentsUseCase(repository)
         val result = useCase.execute(facilitatorID, sortBy, sortOrder, filterBy, filterQuery, page, limit)
-        val expected: List<Student> = listOf()
 
+        // 検証する
+        val expected: List<Student> = listOf()
         assertEquals(expected, result)
     }
 
