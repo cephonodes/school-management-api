@@ -5,10 +5,10 @@ import com.cephonodes.yuki.domain.*
 class SearchStudentsUseCase(private val studentRepository: IStudentRepository) {
     fun execute(
         facilitatorID: Int,
-        sortBy: SortBy,
-        sortOrder: SortOrder,
-        filterBy: FilterBy,
-        filterQuery: String,
+        sortBy: SortBy?,
+        sortOrder: SortOrder?,
+        filterBy: FilterBy?,
+        filterQuery: String?,
         page: Int,
         limit: Int
     ): List<Student> {

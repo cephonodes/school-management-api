@@ -5,10 +5,10 @@ import com.cephonodes.yuki.domain.*
 class StudentRepositoryInMemory : IStudentRepository {
     override fun search(
         facilitatorID: Int,
-        sortBy: SortBy,
-        sortOrder: SortOrder,
-        filterBy: FilterBy,
-        filterQuery: String
+        sortBy: SortBy?,
+        sortOrder: SortOrder?,
+        filterBy: FilterBy?,
+        filterQuery: String?
     ): List<Student> {
         val classA = Classroom(1, "特進クラスA")
         val classB = Classroom(2, "特進クラスB")

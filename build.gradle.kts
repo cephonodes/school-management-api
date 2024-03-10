@@ -7,6 +7,7 @@ val exposed_version: String by project
 plugins {
     kotlin("jvm") version "1.9.23"
     id("io.ktor.plugin") version "2.3.8"
+    kotlin("plugin.serialization") version "1.9.23"
 }
 
 group = "com.cephonodes.yuki"
@@ -26,6 +27,8 @@ repositories {
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("org.postgresql:postgresql:42.7.2")
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
@@ -39,6 +42,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:$kotlin_version")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+    testImplementation("io.mockk:mockk:1.13.7")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

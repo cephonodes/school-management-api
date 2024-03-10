@@ -10,60 +10,69 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object Facilitators : IntIdTable() {
 }
 
-object Students : IntIdTable() {
+object students : IntIdTable() {
     val name = varchar("name", 50)
     val loginID = varchar("login_id", 50)
-    val classroomID = integer("classroom_id").references(Classrooms.id)
+    val classroomID = integer("classroom_id").references(classrooms.id)
 }
 
-object Classrooms : IntIdTable() {
+object classrooms : IntIdTable() {
     val name = varchar("name", 50)
 }
 
-object FacilitatorClassroomRelation : IntIdTable() {
+object facilitator_classroom_relation : IntIdTable() {
     val facilitatorID = integer("facilitator_id").references(Facilitators.id)
-    val classroomID = integer("classroom_id").references(Classrooms.id)
+    val classroomID = integer("classroom_id").references(classrooms.id)
 }
 
 class StudentRepositoryPostgreSql : IStudentRepository {
-    override fun search(facilitatorID: Int, sortBy: SortBy, sortOrder: SortOrder, filterBy: FilterBy, filterQuery: String): List<Student> {
+    override fun search(
+        facilitatorID: Int,
+        sortBy: SortBy?,
+        sortOrder: SortOrder?,
+        filterBy: FilterBy?,
+        filterQuery: String?
+    ): List<Student> {
         val studentFilter =
             when (filterBy) {
-                FilterBy.NAME -> Students.name.like("%$filterQuery%")
-                FilterBy.LOGIN_ID -> Students.loginID.like("%$filterQuery%")
+                null -> booleanLiteral(true)
+                FilterBy.NAME -> students.name.like("%$filterQuery%")
+                FilterBy.LOGIN_ID -> students.loginID.like("%$filterQuery%")
             }
         val sortCondition =
             when (sortBy) {
-                SortBy.NAME -> Students.name
-                SortBy.LOGIN_ID -> Students.loginID
+                null -> students.name
+                SortBy.NAME -> students.name
+                SortBy.LOGIN_ID -> students.loginID
             }
         val sqlSortOrder =
             when (sortOrder) {
+                null -> org.jetbrains.exposed.sql.SortOrder.ASC
                 SortOrder.ASC -> org.jetbrains.exposed.sql.SortOrder.ASC
                 SortOrder.DESC -> org.jetbrains.exposed.sql.SortOrder.DESC
             }
 
-        val students = mutableListOf<Student>()
-        Database.connect(url = "", driver = "org.postgresql.Driver", user = "", password = "")
+        val result = mutableListOf<Student>()
+        Database.connect(url = "jdbc:postgresql://db:5432/school", driver = "org.postgresql.Driver", user = "postgres")
         transaction {
-            (FacilitatorClassroomRelation innerJoin Students innerJoin Classrooms)
-                .select(Students.id, Students.name, Students.loginID, Classrooms.id, Classrooms.name)
+            (facilitator_classroom_relation innerJoin classrooms innerJoin students)
+                .select(students.id, students.name, students.loginID, classrooms.id, classrooms.name)
                 .where {
-                    FacilitatorClassroomRelation.facilitatorID.eq(facilitatorID) and studentFilter
+                    facilitator_classroom_relation.facilitatorID.eq(facilitatorID) and studentFilter
                 }
                 .orderBy(sortCondition, sqlSortOrder)
                 .forEach { row ->
-                    students.add(Student(
-                        row[Students.id].value,
-                        row[Students.name].toString(),
-                        row[Students.loginID].toString(),
+                    result.add(Student(
+                        row[students.id].value,
+                        row[students.name].toString(),
+                        row[students.loginID].toString(),
                         Classroom(
-                            row[Classrooms.id].value,
-                            row[Classrooms.name].toString()
+                            row[classrooms.id].value,
+                            row[classrooms.name].toString()
                         )
                     ))
                 }
         }
-        return students
+        return result
     }
 }
