@@ -22,15 +22,19 @@ class SearchStudentsUseCaseTest {
         limit: Int,
         expected: List<Student>
     ) {
-        val facilitatorID = 1
-        val sortBy = SortBy.NAME
-        val sortOrder = SortOrder.ASC
-        val filterBy = FilterBy.NAME
-        val filterQuery = "abc"
+        val parameters = SearchStudentsUseCaseParameters(
+            facilitatorID = 1,
+            sortBy = SortBy.NAME,
+            sortOrder = SortOrder.ASC,
+            filterBy = FilterBy.NAME,
+            filterQuery = "abc",
+            page = page,
+            limit = limit
+        )
 
         // テスト対象を実行する
         val useCase = SearchStudentsUseCase(StudentRepositoryInMemory())
-        val result = useCase.execute(facilitatorID, sortBy, sortOrder, filterBy, filterQuery, page, limit)
+        val result = useCase.execute(parameters)
 
         // 検証する
         assertEquals(expected, result)
@@ -85,6 +89,15 @@ class SearchStudentsUseCaseTest {
         val limit = 2
         val filterBy = FilterBy.NAME
         val filterQuery = "abc"
+        val parameters = SearchStudentsUseCaseParameters(
+            facilitatorID = facilitatorID,
+            sortBy = sortBy,
+            sortOrder = sortOrder,
+            filterBy = filterBy,
+            filterQuery = filterQuery,
+            page = page,
+            limit = limit
+        )
 
         // モックを作成する
         val repository = mockkClass(StudentRepositoryInMemory::class)
@@ -98,7 +111,7 @@ class SearchStudentsUseCaseTest {
 
         // テスト対象を実行する
         val useCase = SearchStudentsUseCase(repository)
-        val result = useCase.execute(facilitatorID, sortBy, sortOrder, filterBy, filterQuery, page, limit)
+        val result = useCase.execute(parameters)
 
         // 検証する
         val expected: List<Student> = listOf()
@@ -107,17 +120,19 @@ class SearchStudentsUseCaseTest {
 
     @Test
     fun 異常系_存在しないページが指定された時() {
-        val facilitatorID = 1
-        val sortBy = SortBy.NAME
-        val sortOrder = SortOrder.ASC
-        val page = 4
-        val limit = 2
-        val filterBy = FilterBy.NAME
-        val filterQuery = "abc"
+        val parameters = SearchStudentsUseCaseParameters(
+            facilitatorID = 1,
+            sortBy = SortBy.NAME,
+            sortOrder = SortOrder.ASC,
+            filterBy = FilterBy.NAME,
+            filterQuery = "abc",
+            page = 4,
+            limit = 2
+        )
 
         val useCase = SearchStudentsUseCase(StudentRepositoryInMemory())
         assertThrows<IllegalArgumentException> {
-            useCase.execute(facilitatorID, sortBy, sortOrder, filterBy, filterQuery, page, limit)
+            useCase.execute(parameters)
         }
     }
 }

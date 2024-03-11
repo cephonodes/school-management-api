@@ -1,6 +1,7 @@
 package com.cephonodes.yuki.presentation
 
 import com.cephonodes.yuki.application.SearchStudentsUseCase
+import com.cephonodes.yuki.application.SearchStudentsUseCaseParameters
 import com.cephonodes.yuki.domain.*
 import com.cephonodes.yuki.infrastructure.repository.StudentRepositoryInMemory
 import io.ktor.http.*
@@ -13,36 +14,20 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 
-class ExpectedUseCaseInput(
-    val facilitatorID: Int,
-    val sortOrder: SortOrder?,
-    val page: Int,
-    val limit: Int,
-    val sortBy: SortBy?,
-    val filterBy: FilterBy?,
-    val filterQuery: String?
-)
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StudentControllerTest {
     @ParameterizedTest
     @MethodSource("dataProvider")
     fun 正常系(
         queryParameters: Parameters,
-        expectedUseCaseInput: ExpectedUseCaseInput,
+        expectedUseCaseInput: SearchStudentsUseCaseParameters,
         useCaseResult: List<Student>,
         expectedBody: SearchStudentsResponseBody
     ) {
         // モックを作成する
         mockkConstructor(SearchStudentsUseCase::class)
         every { anyConstructed<SearchStudentsUseCase>().execute(
-            facilitatorID = expectedUseCaseInput.facilitatorID,
-            sortOrder = expectedUseCaseInput.sortOrder,
-            page = expectedUseCaseInput.page,
-            limit = expectedUseCaseInput.limit,
-            sortBy = expectedUseCaseInput.sortBy,
-            filterBy = expectedUseCaseInput.filterBy,
-            filterQuery = expectedUseCaseInput.filterQuery
+            expectedUseCaseInput
         ) } returns useCaseResult
 
         // テスト対象を実行する
@@ -66,12 +51,12 @@ class StudentControllerTest {
                 append("order", "asc")
                 append("name_like", "田辺")
             },
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
                 1,
-                SortOrder.ASC,
                 1,
                 2,
                 SortBy.NAME,
+                SortOrder.ASC,
                 FilterBy.NAME,
                 "田辺"
             ),
@@ -99,12 +84,12 @@ class StudentControllerTest {
                 append("order", "desc")
                 append("loginId_like", "123")
             },
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
                 2,
-                SortOrder.DESC,
                 2,
                 1,
                 SortBy.LOGIN_ID,
+                SortOrder.DESC,
                 FilterBy.LOGIN_ID,
                 "123"
             ),
@@ -139,12 +124,12 @@ class StudentControllerTest {
                 append("order", "desc")
                 append("loginId_like", "123")
             },
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
                 2,
-                SortOrder.DESC,
                 2,
                 1,
                 SortBy.LOGIN_ID,
+                SortOrder.DESC,
                 FilterBy.LOGIN_ID,
                 "123"
             ),
@@ -160,20 +145,14 @@ class StudentControllerTest {
     @MethodSource("validationTestDataProvider")
     fun バリデーションチェックのテスト(
         queryParameters: Parameters,
-        expectedUseCaseInput: ExpectedUseCaseInput?,
+        expectedUseCaseInput: SearchStudentsUseCaseParameters?,
         expectedHttpStatusCode: HttpStatusCode
     ) {
         // モックを作成する
         // このテストでは戻り値のうちHTTPステータスコードが確認できればよいので、引数に関わらず適当な結果を返すようにしている
         mockkConstructor(SearchStudentsUseCase::class)
         every { anyConstructed<SearchStudentsUseCase>().execute(
-            facilitatorID = any(),
-            sortOrder = any(),
-            page = any(),
-            limit = any(),
-            sortBy = any(),
-            filterBy = any(),
-            filterQuery = any()
+            any()
         ) } returns listOf(Student(1, "生徒1", "student_1", Classroom(1, "クラス1")))
 
         // テスト対象を実行する
@@ -186,25 +165,13 @@ class StudentControllerTest {
         if (expectedUseCaseInput != null) {
             verify(exactly = 1) {
                 anyConstructed<SearchStudentsUseCase>().execute(
-                    facilitatorID = expectedUseCaseInput.facilitatorID,
-                    sortOrder = expectedUseCaseInput.sortOrder,
-                    page = expectedUseCaseInput.page,
-                    limit = expectedUseCaseInput.limit,
-                    sortBy = expectedUseCaseInput.sortBy,
-                    filterBy = expectedUseCaseInput.filterBy,
-                    filterQuery = expectedUseCaseInput.filterQuery
+                    expectedUseCaseInput
                 )
             }
         } else {
             verify(exactly = 0) {
                 anyConstructed<SearchStudentsUseCase>().execute(
                     any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any()
                 )
             }
         }
@@ -268,12 +235,12 @@ class StudentControllerTest {
                     append("name_like", "123")
                 }
             ),
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
                 1,
-                SortOrder.ASC,
                 1,  // デフォルト値
                 1,
                 SortBy.NAME,
+                SortOrder.ASC,
                 FilterBy.NAME,
                 "123"
             ),
@@ -305,12 +272,12 @@ class StudentControllerTest {
                     append("name_like", "123")
                 }
             ),
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
                 1,
-                SortOrder.ASC,
                 1,
                 1,  // デフォルト値
                 SortBy.NAME,
+                SortOrder.ASC,
                 FilterBy.NAME,
                 "123"
             ),
@@ -341,11 +308,11 @@ class StudentControllerTest {
                     append("name_like", "123")
                 }
             ),
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
+                1,
+                1,
                 1,
                 null,
-                1,
-                1,
                 null,
                 FilterBy.NAME,
                 "123"
@@ -363,12 +330,12 @@ class StudentControllerTest {
                     append("name_like", "123")
                 }
             ),
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
                 1,
-                SortOrder.ASC,  // デフォルト値
                 1,
                 1,
                 SortBy.NAME,
+                SortOrder.ASC,  // デフォルト値
                 FilterBy.NAME,
                 "123"
             ),
@@ -445,12 +412,12 @@ class StudentControllerTest {
                     append("loginId_like", "456")
                 }
             ),
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
                 1,
-                SortOrder.ASC,
                 1,
                 1,
                 SortBy.NAME,
+                SortOrder.ASC,
                 FilterBy.LOGIN_ID,
                 "456"
             ),
@@ -467,12 +434,12 @@ class StudentControllerTest {
                     append("order", "asc")
                 }
             ),
-            ExpectedUseCaseInput(
+            SearchStudentsUseCaseParameters(
                 1,
-                SortOrder.ASC,  // デフォルト値
                 1,
                 1,
                 SortBy.NAME,
+                SortOrder.ASC,  // デフォルト値
                 null,
                 null
             ),

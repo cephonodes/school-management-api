@@ -114,7 +114,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1" | jq
 }
 ```
 
-1ページあたり4件として、1ページ目のデータを取得
+1ページあたり4件として、1ページ目のデータを取得（ソートはしない）
 ```bash
 curl "http://127.0.0.1:8080/students?facilitator_id=1&page=1&limit=4" | jq
 ```
@@ -132,15 +132,6 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=1&limit=4" | jq
       }
     },
     {
-      "id": 101,
-      "name": "生徒101",
-      "loginId": "student_300",
-      "classroom": {
-        "id": 1,
-        "name": "クラス1"
-      }
-    },
-    {
       "id": 11,
       "name": "生徒11",
       "loginId": "student_390",
@@ -150,9 +141,18 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=1&limit=4" | jq
       }
     },
     {
-      "id": 111,
-      "name": "生徒111",
-      "loginId": "student_290",
+      "id": 21,
+      "name": "生徒21",
+      "loginId": "student_380",
+      "classroom": {
+        "id": 1,
+        "name": "クラス1"
+      }
+    },
+    {
+      "id": 31,
+      "name": "生徒31",
+      "loginId": "student_370",
       "classroom": {
         "id": 1,
         "name": "クラス1"
@@ -163,7 +163,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=1&limit=4" | jq
 }
 ```
 
-1ページあたり2件として、2ページ目のデータを取得
+1ページあたり2件として、2ページ目のデータを取得（ソートはしない）
 ```bash
 curl "http://127.0.0.1:8080/students?facilitator_id=1&page=2&limit=2" | jq
 ```
@@ -172,18 +172,18 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=2&limit=2" | jq
 {
   "students": [
     {
-      "id": 11,
-      "name": "生徒11",
-      "loginId": "student_390",
+      "id": 21,
+      "name": "生徒21",
+      "loginId": "student_380",
       "classroom": {
         "id": 1,
         "name": "クラス1"
       }
     },
     {
-      "id": 111,
-      "name": "生徒111",
-      "loginId": "student_290",
+      "id": 31,
+      "name": "生徒31",
+      "loginId": "student_370",
       "classroom": {
         "id": 1,
         "name": "クラス1"

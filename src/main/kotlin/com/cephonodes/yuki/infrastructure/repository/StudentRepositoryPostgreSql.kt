@@ -7,24 +7,39 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object Facilitators : IntIdTable() {
+/**
+ * 先生テーブルのスキーマ
+ */
+object facilitators : IntIdTable() {
 }
 
+/**
+ * 生徒テーブルのスキーマ
+ */
 object students : IntIdTable() {
     val name = varchar("name", 50)
     val loginID = varchar("login_id", 50)
     val classroomID = integer("classroom_id").references(classrooms.id)
 }
 
+/**
+ * クラステーブルのスキーマ
+ */
 object classrooms : IntIdTable() {
     val name = varchar("name", 50)
 }
 
+/**
+ * 先生とクラスの対応関係のテーブルのスキーマ
+ */
 object facilitator_classroom_relation : IntIdTable() {
-    val facilitatorID = integer("facilitator_id").references(Facilitators.id)
+    val facilitatorID = integer("facilitator_id").references(facilitators.id)
     val classroomID = integer("classroom_id").references(classrooms.id)
 }
 
+/**
+ * 生徒のリポジトリの実装 PostgreSQL版
+ */
 class StudentRepositoryPostgreSql : IStudentRepository {
     override fun search(
         facilitatorID: Int,

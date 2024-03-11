@@ -2,6 +2,9 @@ package com.cephonodes.yuki.infrastructure.repository
 
 import com.cephonodes.yuki.domain.*
 
+/**
+ * 生徒のリポジトリの実装 インメモリ版
+ */
 class StudentRepositoryInMemory : IStudentRepository {
     override fun search(
         facilitatorID: Int,
