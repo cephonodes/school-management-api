@@ -23,6 +23,7 @@
 - orderを指定せずにsortを指定することはできますが、sortを指定せずにorderのみを指定された場合は、ステータスコード400を返します。
 - name_likeとloginId_likeはどちらかのみ指定できます。両方指定された場合は、ステータスコード400を返します。
 - pageが範囲外だった場合は、ステータスコード400を返します。
+- ソートは文字列に対するソートです。数字の部分は昇順の場合「"1", "101", "11", "2", ...」のような順番で並ぶことになります。
 
 #### Response
 ##### 成功時
@@ -63,13 +64,16 @@ docker compose up
 ```
 
 ## 動作確認方法
-以下に、動作確認のためのサンプルデータ（コマンド）とレスポンスの例を記載します。
+以下に、動作確認のためのサンプルデータ（コマンド）とレスポンスの組を記載します。
 
-コマンドには、結果を見やすくするためにjqを使っています。
+**コマンドには、結果を見やすくするためにjqを使っています。**
+
+DB内のサンプルデータの内訳は、CSV形式で./doc/sample_data内に置いています。
+
 
 先生1のIDのみでデータを取得
 ```bash
-curl http://127.0.0.1:8080/students?facilitator_id=1 | jq
+curl "http://127.0.0.1:8080/students?facilitator_id=1" | jq
 ```
 
 ```json
@@ -78,7 +82,7 @@ curl http://127.0.0.1:8080/students?facilitator_id=1 | jq
     {
       "id": 1,
       "name": "生徒1",
-      "loginId": "student_1",
+      "loginId": "student_400",
       "classroom": {
         "id": 1,
         "name": "クラス1"
@@ -100,7 +104,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=1&limit=4" | jq
     {
       "id": 1,
       "name": "生徒1",
-      "loginId": "student_1",
+      "loginId": "student_400",
       "classroom": {
         "id": 1,
         "name": "クラス1"
@@ -109,7 +113,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=1&limit=4" | jq
     {
       "id": 101,
       "name": "生徒101",
-      "loginId": "student_101",
+      "loginId": "student_300",
       "classroom": {
         "id": 1,
         "name": "クラス1"
@@ -118,7 +122,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=1&limit=4" | jq
     {
       "id": 11,
       "name": "生徒11",
-      "loginId": "student_11",
+      "loginId": "student_390",
       "classroom": {
         "id": 1,
         "name": "クラス1"
@@ -127,7 +131,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=1&limit=4" | jq
     {
       "id": 111,
       "name": "生徒111",
-      "loginId": "student_111",
+      "loginId": "student_290",
       "classroom": {
         "id": 1,
         "name": "クラス1"
@@ -149,7 +153,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=2&limit=2" | jq
     {
       "id": 11,
       "name": "生徒11",
-      "loginId": "student_11",
+      "loginId": "student_390",
       "classroom": {
         "id": 1,
         "name": "クラス1"
@@ -158,7 +162,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=1&page=2&limit=2" | jq
     {
       "id": 111,
       "name": "生徒111",
-      "loginId": "student_111",
+      "loginId": "student_290",
       "classroom": {
         "id": 1,
         "name": "クラス1"
@@ -180,7 +184,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=3&sort=name&o
     {
       "id": 102,
       "name": "生徒102",
-      "loginId": "student_102",
+      "loginId": "student_299",
       "classroom": {
         "id": 2,
         "name": "クラス2"
@@ -189,7 +193,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=3&sort=name&o
     {
       "id": 103,
       "name": "生徒103",
-      "loginId": "student_103",
+      "loginId": "student_298",
       "classroom": {
         "id": 3,
         "name": "クラス3"
@@ -198,7 +202,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=3&sort=name&o
     {
       "id": 112,
       "name": "生徒112",
-      "loginId": "student_112",
+      "loginId": "student_289",
       "classroom": {
         "id": 2,
         "name": "クラス2"
@@ -220,7 +224,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=3&sort=name&o
     {
       "id": 93,
       "name": "生徒93",
-      "loginId": "student_93",
+      "loginId": "student_308",
       "classroom": {
         "id": 3,
         "name": "クラス3"
@@ -229,7 +233,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=3&sort=name&o
     {
       "id": 92,
       "name": "生徒92",
-      "loginId": "student_92",
+      "loginId": "student_309",
       "classroom": {
         "id": 2,
         "name": "クラス2"
@@ -238,7 +242,7 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=3&sort=name&o
     {
       "id": 83,
       "name": "生徒83",
-      "loginId": "student_83",
+      "loginId": "student_318",
       "classroom": {
         "id": 3,
         "name": "クラス3"
@@ -255,7 +259,38 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=3&sort=loginI
 ````
 
 ```json
-
+{
+  "students": [
+    {
+      "id": 293,
+      "name": "生徒293",
+      "loginId": "student_108",
+      "classroom": {
+        "id": 3,
+        "name": "クラス3"
+      }
+    },
+    {
+      "id": 292,
+      "name": "生徒292",
+      "loginId": "student_109",
+      "classroom": {
+        "id": 2,
+        "name": "クラス2"
+      }
+    },
+    {
+      "id": 283,
+      "name": "生徒283",
+      "loginId": "student_118",
+      "classroom": {
+        "id": 3,
+        "name": "クラス3"
+      }
+    }
+  ],
+  "totalCount": 3
+}
 ```
 
 先生2について、生徒のログインIDで降順にソートしたデータを取得する
@@ -264,33 +299,64 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=3&sort=loginI
 ````
 
 ```json
-
-```
-
-先生2について、生徒の名前で部分一致検索し、生徒の名前で昇順にソートしたデータを取得する
-```bash
-curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=5&sort=name&order=desc&name_like=10" | jq
-```
-
-```json
 {
   "students": [
     {
-      "id": 103,
-      "name": "生徒103",
-      "loginId": "student_103",
+      "id": 302,
+      "name": "生徒302",
+      "loginId": "student_99",
+      "classroom": {
+        "id": 2,
+        "name": "クラス2"
+      }
+    },
+    {
+      "id": 303,
+      "name": "生徒303",
+      "loginId": "student_98",
       "classroom": {
         "id": 3,
         "name": "クラス3"
       }
     },
     {
-      "id": 102,
-      "name": "生徒102",
-      "loginId": "student_102",
+      "id": 392,
+      "name": "生徒392",
+      "loginId": "student_9",
       "classroom": {
         "id": 2,
         "name": "クラス2"
+      }
+    }
+  ],
+  "totalCount": 3
+}
+```
+
+先生2について、生徒の名前で部分一致検索し、生徒の名前で昇順にソートしたデータを取得する
+```bash
+curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=5&sort=name&order=asc&name_like=10" | jq
+```
+
+```json
+{
+  "students": [
+    {
+      "id": 102,
+      "name": "生徒102",
+      "loginId": "student_299",
+      "classroom": {
+        "id": 2,
+        "name": "クラス2"
+      }
+    },
+    {
+      "id": 103,
+      "name": "生徒103",
+      "loginId": "student_298",
+      "classroom": {
+        "id": 3,
+        "name": "クラス3"
       }
     }
   ],
@@ -300,13 +366,34 @@ curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=5&sort=name&o
 
 先生2について、生徒のログインIDで部分一致検索し、生徒のログインIDで昇順にソートしたデータを取得する
 ```bash
-curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=5&sort=loginId&order=desc&loginId_like=10" | jq
+curl "http://127.0.0.1:8080/students?facilitator_id=2&page=1&limit=5&sort=loginId&order=asc&loginId_like=10" | jq
 ```
 
 ```json
-
+{
+  "students": [
+    {
+      "id": 293,
+      "name": "生徒293",
+      "loginId": "student_108",
+      "classroom": {
+        "id": 3,
+        "name": "クラス3"
+      }
+    },
+    {
+      "id": 292,
+      "name": "生徒292",
+      "loginId": "student_109",
+      "classroom": {
+        "id": 2,
+        "name": "クラス2"
+      }
+    }
+  ],
+  "totalCount": 2
+}
 ```
-
 
 条件に合致するデータが1件も無いパターン
 ```bash

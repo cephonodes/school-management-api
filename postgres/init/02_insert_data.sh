@@ -32,7 +32,7 @@ psql -U $pg_user -d $pg_db -c "INSERT INTO classrooms (name) VALUES $classrooms_
 classroom_index=1
 students_values=""
 for ((i=1; i<=students_count; i++)); do
-    students_values+="('生徒$i', 'student_$i', $classroom_index),"
+    students_values+="('生徒$i', 'student_$((students_count-i+1))', $classroom_index),"
     # 各生徒にクラスを順番に割り当てる
     ((classroom_index++))
     if [ "$classroom_index" -gt $classrooms_count ]; then
@@ -49,8 +49,6 @@ classroom_index=1
 for ((i=1; i<=facilitators_count; i++)); do
   # 受け持つクラスの数だけクラスを順番に割り当てる
   for ((j=min_facilitator_classes; j<=classroom_assignment_num; j++)); do
-    echo "classroom_assignment_num: ${classroom_assignment_num}"
-    echo "classroom_index: ${classroom_index}"
     relation_values+="($i, $classroom_index),"
     ((classroom_index++))
     if [ "$classroom_index" -gt $classrooms_count ]; then
