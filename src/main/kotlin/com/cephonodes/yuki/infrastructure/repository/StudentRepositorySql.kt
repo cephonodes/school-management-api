@@ -38,9 +38,14 @@ object facilitator_classroom_relation : IntIdTable() {
 }
 
 /**
- * 生徒のリポジトリの実装 PostgreSQL版
+ * 生徒のリポジトリの実装 SQL版
  */
-class StudentRepositoryPostgreSql : IStudentRepository {
+class StudentRepositorySql(
+    private val dbUrl: String,
+    private val dbDriver: String,
+    private val dbUser: String,
+    private val dbPassword: String?) : IStudentRepository {
+
     override fun search(
         facilitatorID: Int,
         sortBy: SortBy?,
@@ -68,7 +73,11 @@ class StudentRepositoryPostgreSql : IStudentRepository {
             }
 
         val result = mutableListOf<Student>()
-        Database.connect(url = "jdbc:postgresql://db:5432/school", driver = "org.postgresql.Driver", user = "postgres")
+        if (this.dbPassword != null) {
+            Database.connect(url = this.dbUrl, driver = this.dbDriver, user = this.dbUser, password = this.dbPassword)
+        } else {
+            Database.connect(url = this.dbUrl, driver = this.dbDriver, user = this.dbUser)
+        }
         transaction {
             (facilitator_classroom_relation innerJoin classrooms innerJoin students)
                 .select(students.id, students.name, students.loginID, classrooms.id, classrooms.name)
